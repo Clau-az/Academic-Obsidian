@@ -1,0 +1,135 @@
+$passoptions.latex()$
+\documentclass[
+  12pt,                     % Set font size to 12pt
+  $if(papersize)$
+    $papersize$paper,
+  $else$
+    a4paper,               % Default to A4 paper size
+  $endif$
+  $for(classoption)$
+    $classoption$$sep$,
+  $endfor$
+]{$documentclass$}
+
+% Load EB Garamond font and set single line spacing
+\usepackage{ebgaramond}      % Use EB Garamond font
+\usepackage{setspace}
+\singlespacing              % Set line spacing to single
+\usepackage{xcolor}
+
+$if(geometry)$
+\usepackage[$for(geometry)$$geometry$$sep$,$endfor$]{geometry}
+$else$
+\usepackage[a4paper, margin=1in]{geometry} % Ensure A4 paper with 1-inch margins if geometry not specified
+$endif$
+
+\usepackage{amsmath,amssymb}
+\usepackage{fancyhdr}        % Custom headers and footers
+
+% Section numbering settings
+$if(numbersections)$
+\setcounter{secnumdepth}{$if(secnumdepth)$$secnumdepth$$else$5$endif$}
+$else$
+\setcounter{secnumdepth}{-\maxdimen} % Remove section numbering
+$endif$
+
+$fonts.latex()$
+$common.latex()$
+$for(header-includes)$
+$header-includes$
+$endfor$
+$after-header-includes.latex()$
+$hypersetup.latex()$
+
+$if(title)$
+\title{$title$$if(thanks)$\thanks{$thanks$}$endif$}
+$endif$
+
+$if(subtitle)$
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% Add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{$subtitle$}
+$endif$
+
+\author{$for(author)$$author$$sep$ \and $endfor$}
+\date{$date$}
+
+\begin{document}
+
+% Remove \maketitle to ensure the title appears only in the header
+% $if(title)$
+% \maketitle
+% $endif$
+
+% Custom header and footer setup from all pages
+\pagestyle{fancy}
+\fancyhf{} % Clear all header and footer fields
+
+% Header settings
+\fancyhead[L]{$if(title)$$title$$endif$}      % Title on the left side of the header
+\fancyhead[R]{$if(author)$$author$$endif$}    % Author on the right side of the header
+
+% Footer settings
+\fancyfoot[C]{\thepage}                       % Centered page number in the footer
+
+% Header and footer line settings
+\renewcommand{\headrulewidth}{0.4pt}          % Line under the header
+\renewcommand{\footrulewidth}{0pt}            % No line in the footer
+
+$for(include-before)$
+$include-before$
+$endfor$
+
+$if(toc)$
+  $if(toc-title)$
+  \renewcommand*\contentsname{$toc-title$}
+  $endif$
+  {
+  $if(colorlinks)$
+    \hypersetup{linkcolor=$if(toccolor)$$toccolor$$else$$endif$}
+  $endif$
+  \setcounter{tocdepth}{$toc-depth$}
+  \tableofcontents
+  }
+$endif$
+
+$if(lof)$
+\listoffigures
+$endif$
+
+$if(lot)$
+\listoftables
+$endif$
+
+$body$
+
+$if(has-frontmatter)$
+\backmatter
+$endif$
+
+$if(natbib)$
+  $if(bibliography)$
+    $if(biblio-title)$
+      $if(has-chapters)$
+        \renewcommand\bibname{$biblio-title$}
+      $else$
+        \renewcommand\refname{$biblio-title$}
+      $endif$
+    $endif$
+    \bibliography{$for(bibliography)$$bibliography$$sep$,$endfor$}
+  $endif$
+$endif$
+
+$if(biblatex)$
+\printbibliography$if(biblio-title)$[title=$biblio-title$]$endif$
+$endif$
+
+$for(include-after)$
+$include-after$
+$endfor$
+
+\end{document}
